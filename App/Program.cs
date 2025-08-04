@@ -1,18 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using BrowserHistoryParser.Jobs;
-using BrowserHistoryParser.Services;
-using BrowserHistoryParser.Services.Implementation;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+using DataIngestionLayer;
+using Microsoft.Extensions.Configuration;
+
+
+var configuration = new ConfigurationBuilder()
+    .AddEnvironmentVariables()
+    .AddCommandLine(args)
+    .AddJsonFile("appsettings.json", optional: false)
+    .Build();
+
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
-        services.AddSingleton<IBrowserHistoryParser, FirefoxHistoryParser>();
-        services.AddHostedService<HistoryParserJob>(); // Implement the hosted service
+        services.AddFirefoxHistoryParser(configuration);
     })
     .ConfigureLogging((context, loggingBuilder) =>
     {
